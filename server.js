@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const axios = require('axios');
 require('dotenv').config();
 
 const app = express();
@@ -26,19 +27,16 @@ app.post('/api/generate', async (req, res) => {
             return res.status(400).json({ error: 'Запит порожній або надто довгий.' });
         }
 
-        // Безкоштовний шлюз без обмежень по ключах
-        const encodedPrompt = encodeURIComponent(prompt);
-        const response = await fetch(`https://text.pollinations.ai/${encodedPrompt}?model=mistral`);
+        // Прямий запит через axios до безкоштовного API
+        const response = await axios.get(`https://text.pollinations.ai/${encodeURIComponent(prompt)}`, {
+            params: { model: 'mistral' },
+            timeout: 10000
+        });
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const text = await response.text();
-        res.json({ result: text });
+        res.json({ result: response.data });
 
     } catch (error) {
-        console.error('Server error:', error);
+        console.error('Server error details:', error.message);
         res.status(500).json({ error: 'Помилка генерації відповідей. Спробуйте ще раз.' });
     }
 });
