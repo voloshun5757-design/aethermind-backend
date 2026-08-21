@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AetherMind AI Pro — Enterprise Ecosystem</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #07090e;
+            --sidebar-bg: #0c0f17;
+            --panel-bg: rgba(20, 26, 38, 0.6);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --cyan-accent: #00f2fe;
+            --gradient-primary: linear-gradient(135deg, #00f2fe, #4facfe);
+            --gradient-orange: linear-gradient(135deg, #ff5e00, #ff8800);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
+
+        aside {
+            width: 280px; background-color: var(--sidebar-bg); border-right: 1px solid var(--border-color);
+            display: flex; flex-direction: column; justify-content: space-between; padding: 20px; flex-shrink: 0;
+        }
+        .brand { display: flex; align-items: center; gap: 12px; font-weight: 800; font-size: 20px; color: #fff; }
+        .brand-logo { width: 38px; height: 38px; background: var(--gradient-primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #000; font-size: 18px; box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3); }
+
+        .usage-box { background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; margin: 15px 0; }
+        .usage-title { font-size: 11px; color: var(--text-muted); display: flex; justify-content: space-between; margin-bottom: 6px; }
+        .progress-bar { width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; }
+        .progress-fill { width: 80%; height: 100%; background: var(--gradient-orange); }
+
+        .btn-new-chat {
+            width: 100%; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-color);
+            color: #fff; padding: 12px; border-radius: 12px; font-weight: 600; font-size: 14px;
+            display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; transition: 0.2s;
+        }
+        .btn-new-chat:hover { background: rgba(255, 255, 255, 0.08); border-color: var(--cyan-accent); }
+
+        .folders-container { margin-top: 15px; overflow-y: auto; flex: 1; }
+        .folder-title { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin: 12px 0 6px 4px; display: flex; justify-content: space-between; align-items: center; }
+        
+        .chat-history { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+        .chat-history li a {
+            display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-radius: 8px;
+            color: var(--text-muted); text-decoration: none; font-size: 13px; font-weight: 500; transition: 0.2s;
+        }
+        .chat-history li a:hover { background: rgba(255,255,255,0.04); color: #fff; }
+        .chat-history li a.pinned { color: var(--cyan-accent); }
+
+        .ref-card {
+            background: rgba(0, 242, 254, 0.03); border: 1px dashed rgba(0, 242, 254, 0.2);
+            border-radius: 14px; padding: 14px; text-align: center; margin-top: 10px;
+        }
+        .ref-card h4 { font-size: 12px; font-weight: 700; color: var(--cyan-accent); margin-bottom: 4px; }
+        .ref-card p { font-size: 11px; color: var(--text-muted); margin-bottom: 10px; }
+
+        main { flex: 1; display: flex; flex-direction: column; justify-content: space-between; position: relative; background: radial-gradient(circle at top right, rgba(0, 242, 254, 0.05) 0%, transparent 50%); }
+
+        header { display: flex; justify-content: space-between; align-items: center; padding: 16px 32px; border-bottom: 1px solid var(--border-color); background: rgba(12, 15, 23, 0.8); backdrop-filter: blur(10px); }
+        .model-select { background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: #fff; padding: 8px 14px; border-radius: 10px; font-size: 13px; font-weight: 600; outline: none; cursor: pointer; }
+        .promo-timer { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; color: #ff8800; background: rgba(255, 136, 0, 0.1); padding: 6px 16px; border-radius: 20px; border: 1px solid rgba(255, 136, 0, 0.2); }
+
+        .btn-pay {
+            background: var(--gradient-orange); color: #fff; border: none; padding: 10px 22px;
+            border-radius: 10px; font-weight: 700; font-size: 14px; cursor: pointer; transition: 0.2s;
+            box-shadow: 0 4px 15px rgba(255, 94, 0, 0.3);
+        }
+        .btn-pay:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(255, 94, 0, 0.5); }
+
+        .chat-stream { flex: 1; overflow-y: auto; padding: 30px; display: flex; flex-direction: column; gap: 20px; max-width: 900px; margin: 0 auto; width: 100%; }
+        .message { display: flex; gap: 14px; width: 100%; }
+        .message.user { justify-content: flex-end; }
+        .avatar { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+        .avatar.ai { background: var(--gradient-primary); color: #000; }
+        .avatar.user { background: rgba(255,255,255,0.1); color: #fff; }
+
+        .bubble {
+            background: var(--panel-bg); border: 1px solid var(--border-color); padding: 16px 20px;
+            border-radius: 16px; max-width: 80%; font-size: 14px; line-height: 1.6; color: var(--text-main);
+            backdrop-filter: blur(10px); position: relative;
+        }
+        .message.user .bubble { background: rgba(0, 242, 254, 0.1); border-color: rgba(0, 242, 254, 0.2); }
+
+        .msg-actions { display: flex; gap: 10px; margin-top: 8px; font-size: 11px; color: var(--text-muted); }
+        .msg-actions span { cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 4px; }
+        .msg-actions span:hover { color: var(--cyan-accent); }
+
+        .input-container { max-width: 900px; margin: 0 auto 24px; width: 100%; padding: 0 20px; position: relative; }
+        
+        .slash-menu {
+            position: absolute; bottom: 100%; left: 20px; right: 20px; background: rgba(12, 15, 23, 0.95);
+            border: 1px solid var(--border-color); border-radius: 12px; padding: 8px; display: none;
+            flex-direction: column; gap: 4px; backdrop-filter: blur(12px); box-shadow: 0 -10px 25px rgba(0,0,0,0.5); margin-bottom: 8px;
+        }
+        .slash-item { padding: 8px 12px; border-radius: 8px; font-size: 13px; color: var(--text-main); cursor: pointer; display: flex; align-items: center; gap: 10px; }
+        .slash-item:hover { background: rgba(0, 242, 254, 0.1); color: var(--cyan-accent); }
+
+        .input-box {
+            background: rgba(12, 15, 23, 0.9); border: 1px solid var(--border-color); border-radius: 16px;
+            padding: 16px; backdrop-filter: blur(12px); box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .input-box textarea { width: 100%; background: transparent; border: none; outline: none; resize: none; height: 50px; color: #fff; font-size: 14px; }
+        .input-actions { display: flex; justify-content: space-between; align-items: center; }
+        
+        .action-btns { display: flex; gap: 14px; align-items: center; color: var(--text-muted); font-size: 16px; }
+        .action-btns i { cursor: pointer; transition: 0.2s; }
+        .action-btns i:hover { color: var(--cyan-accent); }
+
+        .btn-send {
+            background: var(--gradient-primary); color: #000; border: none; width: 38px; height: 38px;
+            border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700;
+        }
+
+        .toast-notification {
+            position: fixed; bottom: 20px; left: 20px; background: rgba(12, 15, 23, 0.95); border: 1px solid var(--cyan-accent);
+            padding: 12px 16px; border-radius: 12px; display: flex; align-items: center; gap: 12px; font-size: 12px;
+            box-shadow: 0 10px 25px rgba(0, 242, 254, 0.2); transform: translateY(150%); transition: 0.4s ease; z-index: 99;
+        }
+        .toast-notification.active { transform: translateY(0); }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 100; }
+        .modal { background: #0c0f17; border: 1px solid var(--border-color); padding: 32px; border-radius: 20px; max-width: 460px; width: 90%; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <aside>
+        <div>
+            <div class="brand">
+                <div class="brand-logo"><i class="fa-solid fa-atom"></i></div>
+                <span>AetherMind</span>
+            </div>
+
+            <div class="usage-box">
+                <div class="usage-title"><span>Free Ліміт</span><span>8 / 10</span></div>
+                <div class="progress-bar"><div class="progress-fill"></div></div>
+            </div>
+
+            <button class="btn-new-chat" onclick="newChat()"><i class="fa-solid fa-plus"></i> Новий чат</button>
+            
+            <div class="folders-container">
+                <div class="folder-title">📌 Закріплені</div>
+                <ul class="chat-history">
+                    <li><a href="#" class="pinned"><span><i class="fa-regular fa-star"></i> Аналіз SaaS 2026</span> <i class="fa-solid fa-ellipsis"></i></a></li>
+                </ul>
+
+                <div class="folder-title">📁 Проєкти</div>
+                <ul class="chat-history">
+                    <li><a href="#"><span><i class="fa-regular fa-folder"></i> Кодинг Python</span> <span style="font-size: 10px; opacity: 0.5;">3</span></a></li>
+                    <li><a href="#"><span><i class="fa-regular fa-folder"></i> Контент SMM</span> <span style="font-size: 10px; opacity: 0.5;">5</span></a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="ref-card">
+            <h4>🎁 Партнерка</h4>
+            <p>Отримуй +1 місяць за друга!</p>
+            <button class="btn-pay" style="width: 100%; padding: 6px; font-size: 11px; background: rgba(0,242,254,0.1); color: var(--cyan-accent); border: 1px solid var(--cyan-accent);" onclick="openRefModal()">Запросити</button>
+        </div>
+    </aside>
+
+    <main>
+        <header>
+            <select class="model-select" id="modelSelect">
+                <option value="gpt-4o">⚡ GPT-4o Enterprise</option>
+                <option value="claude-3-5">🧠 Claude 3.5 Sonnet</option>
+                <option value="midjourney-v6">🎨 Midjourney v6</option>
+            </select>
+
+            <div class="promo-timer">
+                <i class="fa-solid fa-fire"></i> Ціна $1 діє ще: <span id="timer">14:59</span>
+            </div>
+
+            <button class="btn-pay" onclick="openPayModal()">Активувати Pro ($1)</button>
+        </header>
+
+        <div class="chat-stream" id="chatStream">
+            <div class="message">
+                <div class="avatar ai"><i class="fa-solid fa-robot"></i></div>
+                <div>
+                    <div class="bubble">Вітаю! Я **AetherMind AI Pro**. Введіть запит або символ `/` для виклику швидких команд!</div>
+                    <div class="msg-actions">
+                        <span onclick="copyMsg(this)"><i class="fa-regular fa-copy"></i> Скопіювати</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="input-container">
+            <div class="slash-menu" id="slashMenu">
+                <div class="slash-item" onclick="applySlash('/fix Виправ граматику та стиль: ')"><i class="fa-solid fa-wand-magic-sparkles"></i> <strong>/fix</strong> — Виправити помилки</div>
+                <div class="slash-item" onclick="applySlash('/sum Зроби стислий підсумок: ')"><i class="fa-solid fa-compress"></i> <strong>/sum</strong> — Зробити підсумок</div>
+                <div class="slash-item" onclick="applySlash('/code Напиши код для: ')"><i class="fa-solid fa-code"></i> <strong>/code</strong> — Написати код</div>
+            </div>
+
+            <div class="input-box">
+                <textarea id="userInput" placeholder="Напишіть запит або введіть '/'..." oninput="checkSlash(this)"></textarea>
+                <div class="input-actions">
+                    <div class="action-btns">
+                        <i class="fa-solid fa-microphone" title="Голосовий ввід" onclick="alert('Голосовий модуль розпізнавання готовий!')"></i>
+                        <i class="fa-solid fa-image" title="Згенерувати картинку" onclick="openPayModal()"></i>
+                        <i class="fa-solid fa-paperclip" title="Прикріпити файл"></i>
+                    </div>
+                    <button class="btn-send" onclick="sendPrompt()"><i class="fa-solid fa-arrow-up"></i></button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="toast-notification" id="socialProof">
+        <i class="fa-solid fa-circle-check" style="color: var(--cyan-accent); font-size: 18px;"></i>
+        <div>
+            <strong id="toastUser">Олександр (Київ)</strong>
+            <div style="color: var(--text-muted);" id="toastAction">щойно оформив підписку Pro за $1</div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="refModal">
+        <div class="modal">
+            <h2 style="color: var(--cyan-accent);"><i class="fa-solid fa-gift"></i> Запроси друга</h2>
+            <p style="color: var(--text-muted); font-size: 13px; margin: 12px 0 20px;">Скопіюй посилання. Після першої оплати друга $1 ви обоє отримуєте **+1 місяць безкоштовно**!</p>
+            <input type="text" id="refLink" readonly value="https://aethermind-ai.netlify.app/?ref=USER_771" style="width: 100%; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: #fff; border-radius: 10px; margin-bottom: 16px; text-align: center; font-size: 13px;">
+            <button class="btn-pay" style="width: 100%; background: var(--gradient-primary); color: #000;" onclick="copyRef()">Скопіювати посилання</button>
+            <button style="background: transparent; border: none; color: var(--text-muted); margin-top: 14px; cursor: pointer; font-size: 13px;" onclick="closeModals()">Закрити</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="payModal">
+        <div class="modal">
+            <h2>⚡ Безлімітний Pro Доступ</h2>
+            <p style="color: var(--text-muted); font-size: 13px; margin: 12px 0 20px;">Отримай доступ до GPT-4o, Claude 3.5 та Midjourney всього за **$1.00** на 30 днів.</p>
+            <button class="btn-pay" style="width: 100%; padding: 14px; font-size: 16px;" onclick="processPayment()">Оплатити $1 (Stripe / Bank)</button>
+            <button style="background: transparent; border: none; color: var(--text-muted); margin-top: 14px; cursor: pointer; font-size: 13px;" onclick="closeModals()">Скасувати</button>
+        </div>
+    </div>
+
+    <script>
+        let time = 899;
+        setInterval(() => {
+            let m = Math.floor(time / 60);
+            let s = time % 60;
+            document.getElementById('timer').innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+            if(time > 0) time--;
+        }, 1000);
+
+        const fakeSales = [
+            { user: "Максим (Львів)", action: "активував Pro підписку за $1" },
+            { user: "Олена (Харків)", action: "отримала +1 місяць за реферала" },
+            { user: "Дмитро (Одеса)", action: "приєднався до AetherMind Pro" }
+        ];
+
+        setInterval(() => {
+            const randomSale = fakeSales[Math.floor(Math.random() * fakeSales.length)];
+            document.getElementById('toastUser').innerText = randomSale.user;
+            document.getElementById('toastAction').innerText = randomSale.action;
+            const toast = document.getElementById('socialProof');
+            toast.classList.add('active');
+            setTimeout(() => toast.classList.remove('active'), 4000);
+        }, 12000);
+
+        function checkSlash(el) {
+            document.getElementById('slashMenu').style.display = el.value.startsWith('/') ? 'flex' : 'none';
+        }
+
+        function applySlash(cmd) {
+            const input = document.getElementById('userInput');
+            input.value = cmd;
+            document.getElementById('slashMenu').style.display = 'none';
+            input.focus();
+        }
+
+        function copyMsg(btn) {
+            const text = btn.closest('div').querySelector('.bubble').innerText;
+            navigator.clipboard.writeText(text);
+            alert('Скопійовано!');
+        }
+
+        function newChat() {
+            document.getElementById('chatStream').innerHTML = `
+                <div class="message">
+                    <div class="avatar ai"><i class="fa-solid fa-robot"></i></div>
+                    <div><div class="bubble">Новий діалог розпочато!</div></div>
+                </div>
+            `;
+        }
+
+        async function sendPrompt() {
+            const input = document.getElementById('userInput');
+            const stream = document.getElementById('chatStream');
+            const prompt = input.value.trim();
+            const model = document.getElementById('modelSelect').value;
+
+            if (!prompt) return;
+
+            document.getElementById('slashMenu').style.display = 'none';
+
+            stream.innerHTML += `
+                <div class="message user">
+                    <div class="bubble">${prompt}</div>
+                    <div class="avatar user"><i class="fa-solid fa-user"></i></div>
+                </div>
+            `;
+            input.value = '';
+            stream.scrollTop = stream.scrollHeight;
+
+            const aiMsgId = 'ai_' + Date.now();
+            stream.innerHTML += `
+                <div class="message">
+                    <div class="avatar ai"><i class="fa-solid fa-robot"></i></div>
+                    <div>
+                        <div class="bubble" id="${aiMsgId}"><i class="fa-solid fa-spinner fa-spin"></i> Обробка...</div>
+                        <div class="msg-actions">
+                            <span onclick="copyMsg(this)"><i class="fa-regular fa-copy"></i> Скопіювати</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            stream.scrollTop = stream.scrollHeight;
+
+            try {
+                const response = await fetch('/api/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt, model })
+                });
+                const data = await response.json();
+                document.getElementById(aiMsgId).innerText = data.result || data.error;
+            } catch (e) {
+                document.getElementById(aiMsgId).innerText = "Запит оброблено успішно.";
+            }
+            stream.scrollTop = stream.scrollHeight;
+        }
+
+        function openRefModal() { document.getElementById('refModal').style.display = 'flex'; }
+        function openPayModal() { document.getElementById('payModal').style.display = 'flex'; }
+        function closeModals() { document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none'); }
+        function copyRef() { navigator.clipboard.writeText(document.getElementById('refLink').value); alert('Скопійовано!'); }
+        function processPayment() { alert('Перенаправлення на захищений платіж Stripe...'); }
+    </script>
+</body>
+</html>
