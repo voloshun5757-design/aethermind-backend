@@ -5,7 +5,6 @@ require('dotenv').config();
 
 const app = express();
 
-// Дозволяємо запити з будь-яких сайтів (усуває помилки доступу)
 app.use(cors());
 app.use(express.json());
 
@@ -23,11 +22,10 @@ app.post('/api/generate', async (req, res) => {
             return res.status(500).json({ error: 'API ключ не знайдено в налаштуваннях Render.' });
         }
 
-        // Запит до актуальної безкоштовної моделі Groq
         const response = await axios.post(
             'https://api.groq.com/openai/v1/chat/completions',
             {
-                model: model: 'llama-3.1-8b-instant',
+                model: 'llama-3.1-8b-instant',
                 messages: [{ role: 'user', content: prompt }]
             },
             {
@@ -42,10 +40,8 @@ app.post('/api/generate', async (req, res) => {
         res.json({ result: reply });
 
     } catch (error) {
-        // Детальний вивід помилки в консоль Render для діагностики
         console.error('Помилка Groq API:', error.response ? error.response.data : error.message);
-        
-        const errorMessage = error.response?.data?.error?.message || 'Помилка генерації відповідей. Спробуйте ще раз.';
+        const errorMessage = error.response?.data?.error?.message || 'Помилка генерації відповідей.';
         res.status(500).json({ error: errorMessage });
     }
 });
