@@ -5,23 +5,25 @@ require('dotenv').config();
 
 const app = express();
 
-app.use(cors());
+// Дозволяємо запити з будь-якого сайту (включаючи Netlify)
+app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(express.json());
 
 app.post('/api/generate', async (req, res) => {
     try {
         const { prompt } = req.body;
+        const apiKey = process.env.OPENAI_API_KEY; // або GROQ_API_KEY
 
-        if (!prompt) {
-            return res.status(400).json({ error: 'Запит порожній.' });
-        }
-
-        const apiKey = process.env.OPENAI_API_KEY;
-        
         if (!apiKey) {
-            return res.status(500).json({ error: 'API ключ OpenAI не знайдено в налаштуваннях Render.' });
+            return res.status(500).json({ error: 'API ключ відсутній.' });
         }
 
+        // Запит до OpenAI (або Groq)
         const response = await axios.post(
             'https://api.openai.com/v1/chat/completions',
             {
@@ -36,15 +38,15 @@ app.post('/api/generate', async (req, res) => {
             }
         );
 
-        const reply = response.data.choices[0].message.content;
-        res.json({ result: reply });
+        res.json({ result: response.data.choices[0].message.content });
 
     } catch (error) {
-        console.error('Помилка OpenAI API:', error.response ? error.response.data : error.message);
-        const errorMessage = error.response?.data?.error?.message || 'Помилка генерації відповідей.';
-        res.status(500).json({ error: errorMessage });
+        console.error('SERVER ERROR:', error.response ? error.response.data : error.message);
+        res.status(500).json({ 
+            error: error.response?.data?.error?.message || 'Помилка виконання запиту на сервері.' 
+        });
     }
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`🔒 Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
