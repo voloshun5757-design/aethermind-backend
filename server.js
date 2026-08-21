@@ -25,7 +25,7 @@ app.post('/api/generate', async (req, res) => {
         const response = await axios.post(
             'https://api.groq.com/openai/v1/chat/completions',
             {
-                model: 'llama-3.3-70b-versatile',
+                model: 'gemma2-9b-it',
                 messages: [{ role: 'user', content: prompt }]
             },
             {
