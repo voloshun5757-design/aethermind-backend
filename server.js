@@ -16,17 +16,16 @@ app.post('/api/generate', async (req, res) => {
             return res.status(400).json({ error: 'Запит порожній.' });
         }
 
-        const apiKey = process.env.GROQ_API_KEY;
+        const apiKey = process.env.OPENAI_API_KEY;
         
         if (!apiKey) {
-            return res.status(500).json({ error: 'API ключ не знайдено в налаштуваннях Render.' });
+            return res.status(500).json({ error: 'API ключ OpenAI не знайдено в налаштуваннях Render.' });
         }
 
-        // Запит до актуальної моделі Groq (GPT-OSS 20B)
         const response = await axios.post(
-            'https://api.groq.com/openai/v1/chat/completions',
+            'https://api.openai.com/v1/chat/completions',
             {
-                model: 'openai/gpt-oss-20b',
+                model: 'gpt-4o-mini',
                 messages: [{ role: 'user', content: prompt }]
             },
             {
@@ -41,7 +40,7 @@ app.post('/api/generate', async (req, res) => {
         res.json({ result: reply });
 
     } catch (error) {
-        console.error('Помилка Groq API:', error.response ? error.response.data : error.message);
+        console.error('Помилка OpenAI API:', error.response ? error.response.data : error.message);
         const errorMessage = error.response?.data?.error?.message || 'Помилка генерації відповідей.';
         res.status(500).json({ error: errorMessage });
     }
