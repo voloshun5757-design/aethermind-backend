@@ -1,47 +1,38 @@
 const express = require('express');
 const cors = require('cors');
-const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
 const axios = require('axios');
 require('dotenv').config();
 
 const app = express();
 
-app.use(helmet());
-app.use(cors({ origin: '*' }));
+// Дозволяємо запити з будь-яких сайтів (усуває помилки доступу)
+app.use(cors());
 app.use(express.json());
-
-const limiter = rateLimit({
-    windowMs: 1 * 60 * 1000, 
-    max: 20,
-    message: { error: 'Занадто багато запитів. Зачекайте хвилину.' }
-});
-
-app.use('/api/', limiter);
 
 app.post('/api/generate', async (req, res) => {
     try {
         const { prompt } = req.body;
 
-        if (!prompt || prompt.length > 2000) {
-            return res.status(400).json({ error: 'Запит порожній або надто довгий.' });
+        if (!prompt) {
+            return res.status(400).json({ error: 'Запит порожній.' });
         }
 
         const apiKey = process.env.GROQ_API_KEY;
         
         if (!apiKey) {
-            return res.status(500).json({ error: 'API Key не налаштовано на сервері.' });
+            return res.status(500).json({ error: 'API ключ не знайдено в налаштуваннях Render.' });
         }
 
+        // Запит до актуальної безкоштовної моделі Groq
         const response = await axios.post(
             'https://api.groq.com/openai/v1/chat/completions',
             {
-                model: 'llama-3.1-8b-instant',
+                model: 'llama3-8b-8192',
                 messages: [{ role: 'user', content: prompt }]
             },
             {
                 headers: {
-                    'Authorization': `Bearer ${apiKey}`,
+                    'Authorization': `Bearer ${apiKey.trim()}`,
                     'Content-Type': 'application/json'
                 }
             }
@@ -51,8 +42,11 @@ app.post('/api/generate', async (req, res) => {
         res.json({ result: reply });
 
     } catch (error) {
-        console.error('Server error:', error.response ? error.response.data : error.message);
-        res.status(500).json({ error: 'Помилка генерації відповідей. Спробуйте ще раз.' });
+        // Детальний вивід помилки в консоль Render для діагностики
+        console.error('Помилка Groq API:', error.response ? error.response.data : error.message);
+        
+        const errorMessage = error.response?.data?.error?.message || 'Помилка генерації відповідей. Спробуйте ще раз.';
+        res.status(500).json({ error: errorMessage });
     }
 });
 
